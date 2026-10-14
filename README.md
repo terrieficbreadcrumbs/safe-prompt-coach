@@ -25,6 +25,26 @@ Adults who are new to AI and a little nervous about it.
 - **S – Stop when rushed:** If you feel hurried or pressured, step away before you act on what the AI says.
 - **E – Enlist help when in doubt:** If something seems off or confusing, ask someone you trust.
 
+## Run it locally
+
+You need Java 25 and Maven.
+
+```sh
+mvn test                              # run the tests
+mvn package                           # build target/safe-prompt-coach.jar
+java -jar target/safe-prompt-coach.jar  # start on http://localhost:8080 (set PORT to change it)
+```
+
+Try it:
+
+```sh
+curl localhost:8080/health
+curl -X POST localhost:8080/api/coach -H 'Content-Type: application/json' \
+  -d '{"goal":"summarize","audience":"my book club","taskDescription":"Summarize this article about gardening","sensitive":false}'
+```
+
+`goal` is one of `draft`, `summarize`, `organize`, or `explain`. `taskDescription` can be up to 1,000 characters. `audience` is optional and can be up to 200 characters. If `sensitive` is `true`, the coach adds placeholder guidance and a privacy reminder.
+
 ## About Terriefic Technology Training
 
 Terriefic makes practical AI education and everyday technology guidance easier to understand, with thoughtful support for work, personal life, ethical decision-making, Christian-perspective learning, and navigating devices.
