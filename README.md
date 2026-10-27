@@ -30,9 +30,11 @@ Adults who are new to AI and a little nervous about it.
 You need Java 25 and Maven.
 
 ```sh
-mvn test                              # run the tests
-mvn package                           # build target/safe-prompt-coach.jar
-java -jar target/safe-prompt-coach.jar  # start on http://localhost:8080 (set PORT to change it)
+mvn test                                # run the tests
+mvn compile exec:java                   # start on http://localhost:8080 (set PORT to change it)
+
+mvn package                             # or build target/safe-prompt-coach.jar
+java -jar target/safe-prompt-coach.jar  # and run the jar
 ```
 
 Try it:

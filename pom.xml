@@ -59,6 +59,15 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.6.0</version>
             </plugin>
+            <!-- Lets "mvn compile exec:java" run the app during development -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.4</version>
+                <configuration>
+                    <mainClass>com.terriefic.safepromptcoach.App</mainClass>
+                </configuration>
+            </plugin>
             <!-- Builds one runnable jar: target/safe-prompt-coach.jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

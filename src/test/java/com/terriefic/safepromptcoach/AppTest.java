@@ -113,6 +113,17 @@ class AppTest {
     }
 
     @Test
+    void unknownFieldReturns400ListingTheAllowedFields() throws Exception {
+        HttpResponse<String> response = post("/api/coach", """
+                {"goal": "draft", "audience": "me", "task": "test run", "sensitive": false}
+                """);
+
+        assertEquals(400, response.statusCode());
+        assertEquals("Unknown field in request. Allowed fields: goal, audience, taskDescription, sensitive.",
+                mapper.readTree(response.body()).get("error").asText());
+    }
+
+    @Test
     void emptyBodyReturns400() throws Exception {
         assertEquals(400, post("/api/coach", "").statusCode());
     }
