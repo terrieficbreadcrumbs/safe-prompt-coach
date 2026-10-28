@@ -24,6 +24,12 @@ const counters = [
     { input: taskInput, output: document.getElementById("task-count"), limit: COACH_LIMITS.taskDescription },
 ];
 
+// Results go stale as soon as the form changes. formVersion goes up on every edit and
+// latestRequest on every submission, so a response or copy that finishes afterward can tell
+// it is outdated and is ignored instead of shown.
+let formVersion = 0;
+let latestRequest = 0;
+
 const GENERIC_ERROR = "Something went wrong. Please try again.";
 const NETWORK_ERROR = "Couldn't reach the coach. Check that the app is running, then try again.";
 
@@ -111,6 +117,10 @@ async function submitForm(event) {
         return;
     }
 
+    const request = ++latestRequest;
+    const version = formVersion;
+    const isCurrent = () => request === latestRequest && version === formVersion;
+
     submitButton.disabled = true;
     submitButton.textContent = "Preparing…";
     try {
@@ -125,6 +135,9 @@ async function submitForm(event) {
             }),
         });
         const data = await response.json().catch(() => null);
+        if (!isCurrent()) {
+            return;
+        }
         if (response.ok && data) {
             showResults(data);
         } else {
@@ -133,24 +146,35 @@ async function submitForm(event) {
             showFormError(data && typeof data.error === "string" ? data.error : GENERIC_ERROR);
         }
     } catch {
-        results.hidden = true;
-        showFormError(NETWORK_ERROR);
+        if (isCurrent()) {
+            results.hidden = true;
+            showFormError(NETWORK_ERROR);
+        }
     } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Get my safe prompt";
+        if (request === latestRequest) {
+            submitButton.disabled = false;
+            submitButton.textContent = "Get my safe prompt";
+        }
     }
 }
 
 /** Copies only the suggested prompt. If that isn't possible, selects it so it can be copied by hand. */
 async function copyPrompt() {
+    const version = formVersion;
     if (navigator.clipboard && window.isSecureContext) {
         try {
             await navigator.clipboard.writeText(promptText.value);
+            if (version !== formVersion) {
+                return;
+            }
             copyStatus.textContent = "Copied! The prompt is ready to paste into an AI tool.";
             copyStatus.className = "message success";
             return;
         } catch {
             // Fall through to manual copying.
+        }
+        if (version !== formVersion) {
+            return;
         }
     }
     promptText.focus();
@@ -164,5 +188,16 @@ for (const counter of counters) {
     updateCounter(counter);
     counter.input.addEventListener("input", () => updateCounter(counter));
 }
+
+/** Any edit makes the shown result outdated: hide it and clear the copy status, without moving focus. */
+function discardResults() {
+    formVersion += 1;
+    results.hidden = true;
+    copyStatus.textContent = "";
+    copyStatus.className = "message";
+}
+
+form.addEventListener("input", discardResults);
+form.addEventListener("change", discardResults);
 form.addEventListener("submit", submitForm);
 copyButton.addEventListener("click", copyPrompt);
