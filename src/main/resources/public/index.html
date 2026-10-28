@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Without the Fear: Safe Prompt Coach</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="limits.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+<header class="page-header">
+    <h1>AI Without the Fear: Safe Prompt Coach</h1>
+    <p class="byline">A Terriefic Technology Training project</p>
+</header>
+
+<main>
+    <section aria-labelledby="about-heading">
+        <h2 id="about-heading">What this does</h2>
+        <p>
+            This page helps you <strong>prepare</strong> a prompt, which is the request you type into an AI tool.
+            It does <strong>not</strong> send your prompt to an AI, and it does not do the task for you.
+            When you're ready, you can copy the prompt into an AI tool yourself.
+        </p>
+    </section>
+
+    <section class="privacy-note" aria-labelledby="privacy-heading">
+        <h2 id="privacy-heading">Before you start: keep it private</h2>
+        <p>
+            Use made-up details or placeholders like <code>[NAME]</code>, <code>[ADDRESS]</code>,
+            or <code>[ACCOUNT #]</code> instead of real private information.
+            Don't type real names, account numbers, health details, or anyone else's personal information.
+        </p>
+    </section>
+
+    <form id="coach-form" novalidate aria-labelledby="form-heading">
+        <h2 id="form-heading">Prepare your prompt</h2>
+
+        <div class="field">
+            <label for="goal">What do you want help with?</label>
+            <select id="goal" name="goal" required>
+                <option value="">Choose a goal</option>
+                <option value="draft">Draft: write a first version of something</option>
+                <option value="summarize">Summarize: make something shorter</option>
+                <option value="organize">Organize: put things in order</option>
+                <option value="explain">Explain: understand something</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="audience">Who is it for? <span class="optional">(optional)</span></label>
+            <p id="audience-hint" class="hint">For example: my book club, my manager, or a 10-year-old.</p>
+            <input id="audience" name="audience" type="text" autocomplete="off" spellcheck="true"
+                   aria-describedby="audience-hint audience-count">
+            <p id="audience-count" class="counter"></p>
+        </div>
+
+        <div class="field">
+            <label for="taskDescription">Describe your task</label>
+            <p id="task-hint" class="hint">Say what you need in your own words. Use placeholders for anything private.</p>
+            <textarea id="taskDescription" name="taskDescription" rows="6" autocomplete="off" spellcheck="true"
+                      required aria-describedby="task-hint task-count"></textarea>
+            <p id="task-count" class="counter"></p>
+        </div>
+
+        <div class="field checkbox-field">
+            <input id="sensitive" name="sensitive" type="checkbox" aria-describedby="sensitive-hint">
+            <label for="sensitive">This task involves sensitive information</label>
+            <p id="sensitive-hint" class="hint">
+                Checking this box does <strong>not</strong> make it safe to type private details.
+                Use placeholders either way. Checking it adds extra privacy guidance to your prompt.
+            </p>
+        </div>
+
+        <p id="form-error" class="message error" aria-live="assertive"></p>
+
+        <button id="submit-button" type="submit">Get my safe prompt</button>
+    </form>
+
+    <section id="results" hidden tabindex="-1" aria-labelledby="results-heading">
+        <h2 id="results-heading">Your safe prompt</h2>
+
+        <div id="privacy-reminder-box" class="privacy-note" hidden>
+            <h3>Privacy reminder</h3>
+            <p id="privacy-reminder"></p>
+        </div>
+
+        <h3 id="prompt-heading">Suggested prompt</h3>
+        <textarea id="prompt-text" rows="10" readonly aria-labelledby="prompt-heading"></textarea>
+        <div class="copy-row">
+            <button id="copy-button" type="button">Copy prompt</button>
+            <p id="copy-status" class="message" aria-live="polite"></p>
+        </div>
+
+        <h3>Check your result</h3>
+        <p id="verification-step"></p>
+
+        <h3>Remember to PAUSE</h3>
+        <ul id="pause-list" class="pause-list"></ul>
+    </section>
+</main>
+</body>
+</html>

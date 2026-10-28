@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,6 +49,36 @@ class AppTest {
 
     private URI uri(String path) {
         return URI.create("http://localhost:" + app.port() + path);
+    }
+
+    @Test
+    void rootServesTheCoachPage() throws Exception {
+        HttpResponse<String> response = get("/");
+
+        assertEquals(200, response.statusCode());
+        assertTrue(response.headers().firstValue("Content-Type").orElse("").startsWith("text/html"));
+        assertTrue(response.body().contains("<title>AI Without the Fear: Safe Prompt Coach</title>"));
+    }
+
+    @Test
+    void pageAssetsAreServed() throws Exception {
+        for (String path : new String[] {"/styles.css", "/limits.js", "/app.js"}) {
+            assertEquals(200, get(path).statusCode(), path);
+        }
+    }
+
+    @Test
+    void everyResponseHasTheContentSecurityPolicy() throws Exception {
+        HttpResponse<String> page = get("/");
+        HttpResponse<String> health = get("/health");
+        HttpResponse<String> coach = post("/api/coach", "{\"goal\": \"draft\", \"taskDescription\": \"A note\"}");
+        HttpResponse<String> error = post("/api/coach", "not json");
+
+        for (HttpResponse<String> response : List.of(page, health, coach, error)) {
+            assertEquals(App.CONTENT_SECURITY_POLICY,
+                    response.headers().firstValue("Content-Security-Policy").orElse(null),
+                    response.uri().getPath());
+        }
     }
 
     @Test

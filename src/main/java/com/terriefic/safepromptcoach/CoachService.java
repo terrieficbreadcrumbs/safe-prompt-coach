@@ -8,8 +8,8 @@ public class CoachService {
     public static final String DEFAULT_AUDIENCE = "a general reader";
 
     static final String PLACEHOLDER_NOTE =
-            "I've replaced private details with placeholders like [NAME], [ADDRESS], and [ACCOUNT #]. "
-                    + "Please keep those placeholders as they are.";
+            "Keep any placeholders like [NAME], [ADDRESS], or [ACCOUNT #] exactly as they are, "
+                    + "and don't ask me for the real private details.";
 
     static final String PRIVACY_REMINDER =
             "Before you paste this into an AI tool, replace names, addresses, account numbers, health details, "

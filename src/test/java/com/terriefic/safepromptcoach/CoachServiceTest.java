@@ -79,6 +79,30 @@ class CoachServiceTest {
         service.coach(request("draft", null, task, false));
     }
 
+    // The browser page (limits.js) counts the same way, so these pin down the behavior it copies.
+
+    @Test
+    void emojiWithSkinToneCountAsTwoCharacters() {
+        String thumbsUp = "👍🏽"; // thumbs up + skin tone modifier = 2 code points
+        service.coach(request("draft", null, thumbsUp.repeat(CoachService.MAX_TASK_LENGTH / 2), false));
+        assertThrows(ValidationException.class, () -> service.coach(
+                request("draft", null, thumbsUp.repeat(CoachService.MAX_TASK_LENGTH / 2) + "a", false)));
+    }
+
+    @Test
+    void familyEmojiCountsAsFiveCharacters() {
+        String family = "👨‍👩‍👧"; // man, zero-width joiner, woman, zero-width joiner, girl
+        service.coach(request("draft", null, family.repeat(CoachService.MAX_TASK_LENGTH / 5), false));
+        assertThrows(ValidationException.class, () -> service.coach(
+                request("draft", null, family.repeat(CoachService.MAX_TASK_LENGTH / 5) + "a", false)));
+    }
+
+    @Test
+    void surroundingWhitespaceDoesNotCountTowardTheLimit() {
+        String task = "  \n" + "a".repeat(CoachService.MAX_TASK_LENGTH) + "\t \n";
+        service.coach(request("summarize", null, task, false));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"", "   ", "\n\t"})
     void blankTaskIsRejected(String task) {
@@ -119,7 +143,8 @@ class CoachServiceTest {
     void sensitiveTaskAddsPlaceholderGuidanceAndReminder() {
         CoachResponse response = service.coach(request("organize", "my doctor", "My medication list", true));
 
-        assertTrue(response.suggestedPrompt().endsWith(CoachService.PLACEHOLDER_NOTE));
+        assertTrue(response.suggestedPrompt().endsWith("\n\nKeep any placeholders like [NAME], [ADDRESS], or [ACCOUNT #] "
+                + "exactly as they are, and don't ask me for the real private details."));
         assertEquals(CoachService.PRIVACY_REMINDER, response.privacyReminder());
     }
 

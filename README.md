@@ -37,7 +37,9 @@ mvn package                             # or build target/safe-prompt-coach.jar
 java -jar target/safe-prompt-coach.jar  # and run the jar
 ```
 
-Try it:
+Then open http://localhost:8080/ in your browser to use the coach.
+
+Or try the API directly:
 
 ```sh
 curl localhost:8080/health

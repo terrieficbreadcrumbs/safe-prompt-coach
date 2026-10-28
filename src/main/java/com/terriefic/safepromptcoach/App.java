@@ -3,6 +3,7 @@ package com.terriefic.safepromptcoach;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.javalin.http.staticfiles.Location;
 
 import java.lang.reflect.RecordComponent;
 import java.util.Arrays;
@@ -13,6 +14,10 @@ import java.util.stream.Collectors;
 public class App {
 
     private static final int DEFAULT_PORT = 8080;
+
+    /** Tells the browser to load and send nothing outside this app: no CDNs, outside fonts, or outside calls. */
+    static final String CONTENT_SECURITY_POLICY =
+            "default-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'";
 
     /** The JSON field names of CoachRequest, e.g. "goal, audience, taskDescription, sensitive". */
     private static final String ALLOWED_FIELDS = Arrays.stream(CoachRequest.class.getRecordComponents())
@@ -26,6 +31,11 @@ public class App {
     /** Builds the app without starting it, so tests can start it on any free port. */
     public static Javalin create(CoachService coachService) {
         return Javalin.create(config -> {
+            // The browser page: src/main/resources/public/index.html is served at "/".
+            config.staticFiles.add("/public", Location.CLASSPATH);
+
+            config.routes.before(ctx -> ctx.header("Content-Security-Policy", CONTENT_SECURITY_POLICY));
+
             config.routes.get("/health", ctx -> ctx.result("ok"));
 
             config.routes.post("/api/coach", ctx -> {
