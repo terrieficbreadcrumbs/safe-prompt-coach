@@ -1,0 +1,9 @@
+# Keep the Docker build context small: Maven builds everything inside the image.
+target/
+.git/
+
+# Editor and OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
